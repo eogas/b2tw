@@ -30,7 +30,9 @@ var ROOM_WIDTH = 160,
 
 // create a WebGL renderer, camera
 // and a scene
-var renderer = new THREE.WebGLRenderer();
+var renderer = new THREE.WebGLRenderer({
+	antialias: true
+});
 var camera = new THREE.PerspectiveCamera(
 	FOV,
 	ASPECT,
@@ -143,7 +145,7 @@ scene.add(pointLight3);
 scene.add(pointLight4);
 
 var ball = new THREE.Mesh(new THREE.SphereGeometry(
-	5
+	5, 16, 12
 ));
 
 ball.position.set(0, 0, ROOM_POS);
