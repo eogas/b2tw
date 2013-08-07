@@ -16,7 +16,7 @@ if (viewportRatio > desiredRatio) {
 
 
 // set some camera attributes
-var FOV = 20,
+var FOV = 25,
 	ASPECT = desiredRatio,
 	NEAR = 10,
 	FAR = 10000;
@@ -24,7 +24,7 @@ var FOV = 20,
 // room attributes
 var ROOM_WIDTH = 160,
 	ROOM_HEIGHT = 90,
-	ROOM_DEPTH = 1000,
+	ROOM_DEPTH = 500,
 	ROOM_OFFSET = (ROOM_HEIGHT / 2) * Math.atan(FOV / 2),
 	ROOM_POS = -ROOM_OFFSET - (ROOM_DEPTH / 2);
 
@@ -42,13 +42,11 @@ var scene = new THREE.Scene();
 
 // add the camera to the scene
 scene.add(camera);
-
-// the camera starts at 0,0,0
-// so pull it back
 camera.position.z = 0;
 
 // start the renderer
 renderer.setSize(WIDTH, HEIGHT);
+renderer.shadowMapEnabled = true;
 
 // attach the render-supplied DOM element
 window.addEventListener('load', function() {
@@ -57,23 +55,25 @@ window.addEventListener('load', function() {
 	container.appendChild(renderer.domElement);
 }, false);
 
-var mats = [];
+var wallMat = new THREE.MeshPhongMaterial({
+	color: "rgb(32,32,64)",
+	shininess: 256
+});
+
+var backMat = new THREE.MeshPhongMaterial({
+	color: "rgb(0,0,8)",
+	shininess: 256
+});
 
 // create walls
 var walls = [];
 for (var i = 0; i < 4; i++) {
-
-	// temporary color generation
-	mats[i] = new THREE.MeshLambertMaterial({
-		color: "rgb(" + ((i + 1) * 64) + ",32,128)"
-	});
-
 	walls[i] = new THREE.Mesh(
 		new THREE.PlaneGeometry(
 			ROOM_WIDTH,
 			ROOM_DEPTH
 		),
-		mats[i]
+		wallMat
 	);
 }
 
@@ -91,21 +91,64 @@ walls[3].rotation.y += Math.PI / 2;
 walls[3].rotation.z -= Math.PI / 2;
 walls[3].position = new THREE.Vector3(-ROOM_WIDTH / 2, 0, ROOM_POS);
 
+walls[4] = new THREE.Mesh(
+	new THREE.PlaneGeometry(
+		ROOM_WIDTH,
+		ROOM_HEIGHT
+	),
+	backMat
+);
+
+walls[4].position = new THREE.Vector3(0, 0, -(ROOM_OFFSET + ROOM_DEPTH));
+
 // add the walls to the scene
-for (var i = 0; i < 4; i++) {
+for (var i = 0; i < 5; i++) {
 	scene.add(walls[i]);
 }
 
 // create a point light
-var pointLight = new THREE.PointLight(0xFFFFFF);
+var pointLight1 = new THREE.PointLight(0xFFFFFF, 1);
+var pointLight2 = new THREE.PointLight(0xFFFFFF, 1);
+var pointLight3 = new THREE.PointLight(0xFFFFFF, 1);
+var pointLight4 = new THREE.PointLight(0xFFFFFF, 1);
 
-// set its position
-pointLight.position.x = 0;
-pointLight.position.y = 0;
-pointLight.position.z = 32;
+pointLight1.position.set(
+	ROOM_WIDTH / 4,
+	ROOM_HEIGHT / 4,
+	(-ROOM_DEPTH / 5) - ROOM_OFFSET
+);
+
+pointLight2.position.set(
+	-ROOM_WIDTH / 4,
+	ROOM_HEIGHT / 4,
+	2 * (-ROOM_DEPTH / 5) - ROOM_OFFSET
+);
+
+pointLight3.position.set(
+	ROOM_WIDTH / 4,
+	ROOM_HEIGHT / 4,
+	3 * (-ROOM_DEPTH / 5) - ROOM_OFFSET
+);
+
+pointLight4.position.set(
+	-ROOM_WIDTH / 4,
+	ROOM_HEIGHT / 4,
+	4 * (-ROOM_DEPTH / 5) - ROOM_OFFSET
+);
 
 // add to the scene
-scene.add(pointLight);
+scene.add(pointLight1);
+scene.add(pointLight2);
+scene.add(pointLight3);
+scene.add(pointLight4);
+
+var ball = new THREE.Mesh(new THREE.SphereGeometry(
+	5
+));
+
+ball.position.set(0, 0, ROOM_POS);
+
+scene.add(ball);
 
 // draw!
 renderer.render(scene, camera);
