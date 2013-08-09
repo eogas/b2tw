@@ -18,15 +18,15 @@ if (viewportRatio > desiredRatio) {
 // set some camera attributes
 var FOV = 25,
 	ASPECT = desiredRatio,
-	NEAR = 10,
+	NEAR = .1,
 	FAR = 10000;
 
 // room attributes
 var ROOM_WIDTH = 160,
 	ROOM_HEIGHT = 90,
 	ROOM_DEPTH = 500,
-	ROOM_OFFSET = (ROOM_HEIGHT / 2) * Math.atan(FOV / 2),
-	ROOM_POS = -ROOM_OFFSET - (ROOM_DEPTH / 2);
+	ROOM_OFFSET = (ROOM_HEIGHT / 2) / Math.tan((FOV / 2) * (Math.PI / 180)),
+	ROOM_POS = -(ROOM_OFFSET + (ROOM_DEPTH / 2));
 
 // create a WebGL renderer, camera
 // and a scene
@@ -67,17 +67,44 @@ var backMat = new THREE.MeshPhongMaterial({
 	shininess: 256
 });
 
-// create walls
+var ballMat = new THREE.MeshPhongMaterial({
+	color: "rgb(128,32,0)",
+	shininess: 256
+});
+
 var walls = [];
-for (var i = 0; i < 4; i++) {
-	walls[i] = new THREE.Mesh(
-		new THREE.PlaneGeometry(
-			ROOM_WIDTH,
-			ROOM_DEPTH
-		),
-		wallMat
-	);
-}
+
+walls[0] = new THREE.Mesh(
+	new THREE.PlaneGeometry(
+		ROOM_WIDTH,
+		ROOM_DEPTH
+	),
+	wallMat
+);
+
+walls[1] = new THREE.Mesh(
+	new THREE.PlaneGeometry(
+		ROOM_WIDTH,
+		ROOM_DEPTH
+	),
+	wallMat
+);
+
+walls[2] = new THREE.Mesh(
+	new THREE.PlaneGeometry(
+		ROOM_HEIGHT,
+		ROOM_DEPTH
+	),
+	wallMat
+);
+
+walls[3] = new THREE.Mesh(
+	new THREE.PlaneGeometry(
+		ROOM_HEIGHT,
+		ROOM_DEPTH
+	),
+	wallMat
+);
 
 walls[0].rotation.x -= Math.PI / 2;
 walls[0].position = new THREE.Vector3(0, -(ROOM_HEIGHT / 2), ROOM_POS);
@@ -146,11 +173,29 @@ scene.add(pointLight4);
 
 var ball = new THREE.Mesh(new THREE.SphereGeometry(
 	5, 16, 12
-));
+), ballMat);
 
 ball.position.set(0, 0, ROOM_POS);
 
 scene.add(ball);
+
+var PAD_WIDTH = ROOM_WIDTH / 5,
+	PAD_HEIGHT = ROOM_HEIGHT / 5;
+
+var padMat = new THREE.MeshBasicMaterial({
+	color: "rgb(64,128,64)",
+	transparent: true,
+	opacity: 0.5
+});
+
+var pad = new THREE.Mesh(new THREE.PlaneGeometry(
+	PAD_WIDTH,
+	PAD_HEIGHT
+), padMat);
+
+pad.position.set(0, 0, -ROOM_OFFSET);
+
+scene.add(pad);
 
 // draw!
 renderer.render(scene, camera);
