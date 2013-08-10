@@ -50,11 +50,22 @@ camera.position.z = 0;
 renderer.setSize(WIDTH, HEIGHT);
 renderer.shadowMapEnabled = true;
 
+var halfwidth = ROOM_WIDTH / 2,
+	halfheight = ROOM_HEIGHT / 2,
+	s2rWidth = ROOM_WIDTH / WIDTH,
+	s2rHeight = ROOM_HEIGHT / HEIGHT;
+
 // attach the render-supplied DOM element
 window.addEventListener('load', function() {
 	// get the DOM element to attach to
 	var container = document.getElementById('container');
 	container.appendChild(renderer.domElement);
+
+	container.onmousemove = function(e) {
+		pad.position.x = (e.x * s2rWidth) - halfwidth;
+		pad.position.y = -((e.y * s2rHeight) - halfheight);
+	}
+
 }, false);
 
 var wallMat = new THREE.MeshPhongMaterial({
@@ -197,5 +208,37 @@ pad.position.set(0, 0, -ROOM_OFFSET);
 
 scene.add(pad);
 
-// draw!
-renderer.render(scene, camera);
+
+var update = function() {
+
+};
+
+var render = function() {
+	renderer.render(scene, camera);
+}
+
+var gameLoop = function() {
+
+	update();
+
+	render();
+};
+
+// shim layer with setTimeout fallback
+window.requestAnimFrame = (function(){
+  return  window.requestAnimationFrame       ||
+          window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame    ||
+          function( callback ){
+            window.setTimeout(callback, 1000 / 60);
+          };
+})();
+
+
+// usage:
+// instead of setInterval(render, 16) ....
+
+(function animloop(){
+  requestAnimFrame(animloop);
+  gameLoop();
+})();
