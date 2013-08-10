@@ -53,7 +53,9 @@ renderer.shadowMapEnabled = true;
 var halfwidth = ROOM_WIDTH / 2,
 	halfheight = ROOM_HEIGHT / 2,
 	s2rWidth = ROOM_WIDTH / WIDTH,
-	s2rHeight = ROOM_HEIGHT / HEIGHT;
+	s2rHeight = ROOM_HEIGHT / HEIGHT,
+	mouseX,
+	mouseY;
 
 // attach the render-supplied DOM element
 window.addEventListener('load', function() {
@@ -62,8 +64,8 @@ window.addEventListener('load', function() {
 	container.appendChild(renderer.domElement);
 
 	container.onmousemove = function(e) {
-		pad.position.x = (e.x * s2rWidth) - halfwidth;
-		pad.position.y = -((e.y * s2rHeight) - halfheight);
+		mouseX = e.x;
+		mouseY = e.y;
 	}
 
 }, false);
@@ -210,7 +212,8 @@ scene.add(pad);
 
 
 var update = function() {
-
+	pad.position.x = (mouseX * s2rWidth) - halfwidth;
+	pad.position.y = -((mouseY * s2rHeight) - halfheight);
 };
 
 var render = function() {
