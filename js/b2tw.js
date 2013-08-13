@@ -58,16 +58,11 @@ var halfwidth = ROOM_WIDTH / 2,
 	mouseY;
 
 // attach the render-supplied DOM element
+var container;
 window.addEventListener('load', function() {
 	// get the DOM element to attach to
-	var container = document.getElementById('container');
+	container = document.getElementById('container');
 	container.appendChild(renderer.domElement);
-
-	container.onmousemove = function(e) {
-		mouseX = e.x;
-		mouseY = e.y;
-	}
-
 }, false);
 
 var wallMat = new THREE.MeshPhongMaterial({
@@ -212,8 +207,6 @@ scene.add(pad);
 
 
 var update = function() {
-	pad.position.x = (mouseX * s2rWidth) - halfwidth;
-	pad.position.y = -((mouseY * s2rHeight) - halfheight);
 };
 
 var render = function() {
@@ -221,27 +214,46 @@ var render = function() {
 }
 
 var gameLoop = function() {
-
 	update();
-
 	render();
 };
 
+// http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
 // shim layer with setTimeout fallback
 window.requestAnimFrame = (function(){
-  return  window.requestAnimationFrame       ||
-          window.webkitRequestAnimationFrame ||
-          window.mozRequestAnimationFrame    ||
-          function( callback ){
-            window.setTimeout(callback, 1000 / 60);
-          };
+	return  window.requestAnimationFrame   ||
+		window.webkitRequestAnimationFrame ||
+		window.mozRequestAnimationFrame    ||
+		function( callback ){
+			window.setTimeout(callback, 1000 / 60);
+	};
 })();
-
-
-// usage:
-// instead of setInterval(render, 16) ....
 
 (function animloop(){
-  requestAnimFrame(animloop);
-  gameLoop();
+	requestAnimFrame(animloop);
+	gameLoop();
 })();
+
+function lockPointer() {
+    container.requestPointerLock =
+		container.requestPointerLock    ||
+		container.mozRequestPointerLock ||
+		container.webkitRequestPointerLock;
+    container.requestPointerLock();
+}
+
+document.addEventListener('mousemove', function(e) {
+	var movementX =
+		e.movementX       ||
+		e.mozMovementX    ||
+		e.webkitMovementX ||
+		0,
+	movementY =
+		e.movementY       ||
+		e.mozMovementY    ||
+		e.webkitMovementY ||
+		0;
+
+	pad.position.x += movementX * s2rWidth;
+	pad.position.y -= movementY * s2rHeight;
+});
