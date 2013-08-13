@@ -234,13 +234,13 @@ window.requestAnimFrame = (function(){
 	gameLoop();
 })();
 
-function lockPointer() {
+window.addEventListener("click", function(e) {
     container.requestPointerLock =
 		container.requestPointerLock    ||
 		container.mozRequestPointerLock ||
 		container.webkitRequestPointerLock;
     container.requestPointerLock();
-};
+});
 
 document.addEventListener('mousemove', function(e) {
 	var movementX =
