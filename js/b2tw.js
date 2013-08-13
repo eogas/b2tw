@@ -240,7 +240,7 @@ function lockPointer() {
 		container.mozRequestPointerLock ||
 		container.webkitRequestPointerLock;
     container.requestPointerLock();
-}
+};
 
 document.addEventListener('mousemove', function(e) {
 	var movementX =
@@ -256,4 +256,22 @@ document.addEventListener('mousemove', function(e) {
 
 	pad.position.x += movementX * s2rWidth;
 	pad.position.y -= movementY * s2rHeight;
+
+	var xEdge = (ROOM_WIDTH / 2) - (pad.geometry.width / 2),
+		yEdge = (ROOM_HEIGHT / 2) - (pad.geometry.height / 2);
+
+	if (pad.position.x < -xEdge) {
+		pad.position.x = -xEdge;
+	} else if (pad.position.x > xEdge) {
+		pad.position.x = xEdge;
+	}
+
+	if (pad.position.y < -yEdge) {
+		pad.position.y = -yEdge;
+	} else if (pad.position.y > yEdge) {
+		pad.position.y = yEdge;
+	}
 });
+
+function constrainBounds() {
+};
